@@ -7,7 +7,8 @@ An Unofficial API for downloading high-quality songs, albums, playlists, and mor
 
 ## 📚 Documentation
 
-Check out the [API documentation](https://saavn.dev/docs) for detailed information on how to use the API.
+- [API Documentation](https://saavn.dev/docs) - Detailed information on how to use the API.
+- [Architecture & Developer Guide](ARCHITECTURE.md) - Learn about the project's architecture and how to contribute.
 
 ## 📰 Changelog
 
