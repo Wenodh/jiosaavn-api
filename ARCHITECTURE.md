@@ -1,6 +1,8 @@
-# JioSaavn API Architecture & Developer Guide
+# JioSaavn API Architecture
 
-Welcome to the **JioSaavn API** project! This guide is designed to help you understand how the project is built, how it works under the hood, and how you can contribute to it. Whether you are a seasoned developer or an intern just starting out, this document will walk you through the architecture and design patterns used here.
+Welcome to the **JioSaavn API** project! This document provides a deep dive into the architecture, design patterns, and internal workings of the API. It is designed to help you understand how data flows through the system and the reasoning behind our technical decisions.
+
+For instructions on setting up your development environment, please see the [Developer Guide](DEVELOPER_GUIDE.md).
 
 ---
 
@@ -144,13 +146,4 @@ Create a `.spec.ts` file next to your use case or controller. Run `bun test` to 
 
 ---
 
-## 🛠 Running and Testing
-
-- **Dev Mode**: `bun run dev`
-- **Build**: `bun run build`
-- **Lint**: `bun run lint`
-- **Test**: `bun run test`
-
----
-
-Thank you for contributing to the JioSaavn API! If you have any questions, feel free to open an issue or reach out to the maintainers.
+For more details on coding standards and how to contribute, refer to the [Developer Guide](DEVELOPER_GUIDE.md).
