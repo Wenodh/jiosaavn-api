@@ -1,5 +1,5 @@
-import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
+import { CacheTTL, Endpoints } from '#common/constants'
+import { useCache, useFetch } from '#common/helpers'
 import { createSongPayload } from '#modules/songs/helpers'
 import { HTTPException } from 'hono/http-exception'
 import type { IUseCase } from '#common/types'
@@ -14,17 +14,23 @@ export class GetSongByIdUseCase implements IUseCase<GetSongByIdArgs, z.infer<typ
   constructor() {}
 
   async execute({ songIds }: GetSongByIdArgs) {
-    const { data } = await useFetch<{ songs: z.infer<typeof SongAPIResponseModel>[] }>({
-      endpoint: Endpoints.songs.id,
-      params: {
-        pids: songIds
-      }
-    })
+    return useCache(
+      `songs:${songIds}`,
+      async () => {
+        const { data } = await useFetch<{ songs: z.infer<typeof SongAPIResponseModel>[] }>({
+          endpoint: Endpoints.songs.id,
+          params: {
+            pids: songIds
+          }
+        })
 
-    if (!data.songs?.length) throw new HTTPException(404, { message: 'song not found' })
+        if (!data.songs?.length) throw new HTTPException(404, { message: 'song not found' })
 
-    const songs = data.songs.map((song) => createSongPayload(song))
+        const songs = data.songs.map((song) => createSongPayload(song))
 
-    return songs
+        return songs
+      },
+      CacheTTL.songs
+    )
   }
 }

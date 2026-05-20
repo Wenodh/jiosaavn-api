@@ -67,30 +67,44 @@ src/
 
 ---
 
-## 🔄 Request Lifecycle
+## 🔄 Request Lifecycle & Multi-layer Caching
 
-When a client sends a request to the API, it follows this flow:
+When a client sends a request, it follows a multi-layer caching strategy to ensure low latency and reduced pressure on upstream servers.
+
+### Caching Layers
+1.  **Edge Cache (Vercel)**: Responses are cached at the edge using `Cache-Control` headers (`s-maxage`). This is the fastest layer.
+2.  **Distributed Cache (Vercel KV)**: If edge cache misses, the application checks Vercel KV (Redis) for a cached version of the transformed data.
+3.  **Upstream API**: If both caches miss, the application fetches fresh data from JioSaavn, transforms it, and populates the caches.
 
 ```mermaid
 sequenceDiagram
     participant Client
+    participant Edge as Vercel Edge
     participant Controller
-    participant Service
     participant UseCase
-    participant FetchHelper
+    participant KV as Vercel KV (Redis)
     participant JioSaavn
 
-    Client->>Controller: GET /api/songs/:id
-    Controller->>Service: getSongByIds(id)
-    Service->>UseCase: execute(id)
-    UseCase->>FetchHelper: useFetch(endpoint, params)
-    FetchHelper->>JioSaavn: HTTP Request (internal API)
-    JioSaavn-->>FetchHelper: Raw JSON Data
-    FetchHelper-->>UseCase: Parsed Data
-    UseCase->>UseCase: Transform Data (Helpers/Models)
-    UseCase-->>Service: Clean Song Object
-    Service-->>Controller: Clean Song Object
-    Controller-->>Client: 200 OK (JSON Response)
+    Client->>Edge: GET /api/songs/:id
+    alt Edge HIT
+        Edge-->>Client: 200 OK (Cached Response)
+    else Edge MISS
+        Edge->>Controller: Forward Request
+        Controller->>UseCase: execute(id)
+        UseCase->>KV: get(key)
+        alt KV HIT
+            KV-->>UseCase: Cached Transformed Data
+        else KV MISS
+            UseCase->>JioSaavn: Fetch Raw Data
+            JioSaavn-->>UseCase: Raw JSON
+            UseCase->>UseCase: Transform Data
+            UseCase->>KV: set(key, transformedData, TTL)
+        end
+        UseCase-->>Controller: Transformed Data
+        Controller->>Edge: Set Cache Headers
+        Controller-->>Edge: 200 OK (JSON)
+        Edge-->>Client: 200 OK (JSON)
+    end
 ```
 
 ---

@@ -1,5 +1,5 @@
-import { Endpoints } from '#common/constants'
-import { useFetch } from '#common/helpers'
+import { CacheTTL, Endpoints } from '#common/constants'
+import { useCache, useFetch } from '#common/helpers'
 import { createAlbumPayload } from '#modules/albums/helpers'
 import { HTTPException } from 'hono/http-exception'
 import type { IUseCase } from '#common/types'
@@ -10,13 +10,19 @@ export class GetAlbumByIdUseCase implements IUseCase<string, z.infer<typeof Albu
   constructor() {}
 
   async execute(id: string) {
-    const { data } = await useFetch<z.infer<typeof AlbumAPIResponseModel>>({
-      endpoint: Endpoints.albums.id,
-      params: { albumid: id }
-    })
+    return useCache(
+      `albums:${id}`,
+      async () => {
+        const { data } = await useFetch<z.infer<typeof AlbumAPIResponseModel>>({
+          endpoint: Endpoints.albums.id,
+          params: { albumid: id }
+        })
 
-    if (!data) throw new HTTPException(404, { message: 'album not found' })
+        if (!data) throw new HTTPException(404, { message: 'album not found' })
 
-    return createAlbumPayload(data)
+        return createAlbumPayload(data)
+      },
+      CacheTTL.albums
+    )
   }
 }

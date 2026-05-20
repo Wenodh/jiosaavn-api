@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { CacheTTL } from '#common/constants'
 import { AlbumModel } from '#modules/albums/models'
 import { AlbumService } from '#modules/albums/services'
 import type { Routes } from '#common/types'
@@ -71,6 +72,8 @@ export class AlbumController implements Routes {
         const { id, link } = ctx.req.valid('query')
 
         const response = link ? await this.albumService.getAlbumByLink(link) : await this.albumService.getAlbumById(id!)
+
+        ctx.header('Cache-Control', `public, s-maxage=${CacheTTL.albums}, stale-while-revalidate`)
 
         return ctx.json({ success: true, data: response })
       }

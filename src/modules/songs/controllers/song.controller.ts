@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
+import { CacheTTL } from '#common/constants'
 import { SongModel } from '#modules/songs/models'
 import { SongService } from '#modules/songs/services'
 import { z } from 'zod'
@@ -79,6 +80,8 @@ export class SongController implements Routes {
           ? await this.songService.getSongByLink(link)
           : await this.songService.getSongByIds({ songIds: ids! })
 
+        ctx.header('Cache-Control', `public, s-maxage=${CacheTTL.songs}, stale-while-revalidate`)
+
         return ctx.json({ success: true, data: response })
       }
     )
@@ -127,6 +130,8 @@ export class SongController implements Routes {
         const songId = ctx.req.param('id')
 
         const response = await this.songService.getSongByIds({ songIds: songId })
+
+        ctx.header('Cache-Control', `public, s-maxage=${CacheTTL.songs}, stale-while-revalidate`)
 
         return ctx.json({ success: true, data: response })
       }

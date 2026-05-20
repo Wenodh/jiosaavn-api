@@ -21,7 +21,14 @@ Before you start, ensure you have the following installed on your machine:
    cd jiosaavn-api
    ```
 
-2. **Install Dependencies**:
+2. **Setup Environment Variables**:
+   Create a `.env` file in the root directory and add the following (required for Vercel KV caching):
+   ```env
+   KV_REST_API_URL="your-vercel-kv-rest-url"
+   KV_REST_API_TOKEN="your-vercel-kv-rest-token"
+   ```
+
+3. **Install Dependencies**:
    ```bash
    bun install
    ```
