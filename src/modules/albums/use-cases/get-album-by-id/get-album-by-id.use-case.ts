@@ -10,7 +10,7 @@ export class GetAlbumByIdUseCase implements IUseCase<string, z.infer<typeof Albu
   constructor() {}
 
   async execute(id: string) {
-    return useCache(
+    return await useCache(
       `albums:${id}`,
       async () => {
         const { data } = await useFetch<z.infer<typeof AlbumAPIResponseModel>>({

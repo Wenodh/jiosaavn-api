@@ -14,7 +14,7 @@ export class GetSongByIdUseCase implements IUseCase<GetSongByIdArgs, z.infer<typ
   constructor() {}
 
   async execute({ songIds }: GetSongByIdArgs) {
-    return useCache(
+    return await useCache(
       `songs:${songIds}`,
       async () => {
         const { data } = await useFetch<{ songs: z.infer<typeof SongAPIResponseModel>[] }>({

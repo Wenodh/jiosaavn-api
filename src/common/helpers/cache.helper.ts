@@ -1,17 +1,22 @@
+import process from 'node:process'
 import { createClient } from '@vercel/kv'
 
-const kv = createClient({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!
-})
+let kv: ReturnType<typeof createClient> | null = null
 
 export const useCache = async <T>(key: string, fetcher: () => Promise<T>, ttl: number): Promise<T> => {
   // Disable cache if environment variables are missing
   if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-    return fetcher()
+    return await fetcher()
   }
 
   try {
+    if (!kv) {
+      kv = createClient({
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN
+      })
+    }
+
     const cachedData = await kv.get<T>(key)
 
     if (cachedData) {

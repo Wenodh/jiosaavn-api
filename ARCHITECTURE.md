@@ -153,7 +153,6 @@ Create a `.spec.ts` file next to your use case or controller. Run `bun test` to 
 
 ## 📈 Future Improvements
 
-- **Caching**: Implement Redis or in-memory caching to reduce requests to JioSaavn and speed up responses.
 - **Rate Limiting**: Protect the API from abuse.
 - **SDK**: Create a client-side SDK for easier integration in web/mobile apps.
 - **Error Handling**: Implement more granular error messages and logging.

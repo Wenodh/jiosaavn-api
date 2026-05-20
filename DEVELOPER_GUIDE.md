@@ -33,7 +33,7 @@ Before you start, ensure you have the following installed on your machine:
    bun install
    ```
 
-3. **Start Development Server**:
+4. **Start Development Server**:
    ```bash
    bun run dev
    ```

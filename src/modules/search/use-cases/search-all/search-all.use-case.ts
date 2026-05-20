@@ -8,7 +8,7 @@ import type { z } from 'zod'
 
 export class SearchAllUseCase implements IUseCase<string, z.infer<typeof SearchModel>> {
   async execute(query: string): Promise<z.infer<typeof SearchModel>> {
-    return useCache(
+    return await useCache(
       `search:${query}`,
       async () => {
         const { data } = await useFetch<z.infer<typeof SearchAPIResponseModel>>({
