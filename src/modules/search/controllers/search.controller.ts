@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { CacheTTL } from '#common/constants'
 import {
   SearchAlbumModel,
   SearchArtistModel,
@@ -61,6 +62,8 @@ export class SearchController implements Routes {
         const { query } = ctx.req.valid('query')
 
         const result = await this.searchService.searchAll(query)
+
+        ctx.header('Cache-Control', `public, s-maxage=${CacheTTL.search}, stale-while-revalidate`)
 
         return ctx.json({ success: true, data: result })
       }
